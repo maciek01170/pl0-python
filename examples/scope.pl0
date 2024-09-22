@@ -1,0 +1,21 @@
+# This program demonstrates lexically scoped variables.
+# It should print out the numbers 2 and 10 in sequence.
+
+var x, x, z;
+procedure a(a,b,v);
+    var x;
+    procedure b;
+        begin
+            x123 := 3
+        end;
+
+    begin
+        x := 2;
+        call b;
+        ! x
+    end;
+begin
+    x := 10;
+    call a(x+2, y, z*2 - 12);
+    ! x
+end.

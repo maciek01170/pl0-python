@@ -1,0 +1,9 @@
+# This program tests if statements and constants.
+
+CONST X = 20;
+
+BEGIN
+    IF X >= 10 THEN WRITELN(10);
+    IF X >= 20 THEN WRITELN(20);
+    IF X >= 30 THEN WRITELN(30);
+END.
