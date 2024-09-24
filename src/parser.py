@@ -1,5 +1,7 @@
 import lexer
 import utils
+from symtab import Symtab
+
 
 class ParseError(Exception):
     pass
@@ -66,6 +68,7 @@ class Parser(SymbolParser):
 
     def __init__(self):
         SymbolParser.__init__(self, lexer.create())
+        self.symtab = Symtab()
 
     def p_program(self):
         block = self.required(self.p_block(), 'block')
@@ -87,6 +90,7 @@ class Parser(SymbolParser):
             constants = ['CONSTANTS']
 
             while True:
+                const_def = (self.sym.name, 'CONST')
                 self.get_sym()
 
                 assignment = self.p_const_assign()
@@ -96,6 +100,7 @@ class Parser(SymbolParser):
 
                 if self.is_sym('EOS'):
                     self.get_sym()
+                    self.symtab.new_symbol(self.sym.value, const_def)
                     return constants
 
                 self.expect_sym('COMMA')
@@ -139,14 +144,14 @@ class Parser(SymbolParser):
         else:
             return None
 
-    def p_procedure_decl_parameters(self):
+    def p_procedure_decl_params(self):
         if self.is_sym('LPAREN'):
             params = ['PARAMETERS']
             self.get_sym()
             while True:
                 self.expect_sym('NAME')
-
                 params.append(('NAME', self.sym.value,))
+                self.symtab.new_symbol(self.sym.value, params)
 
                 self.get_sym()
 
@@ -164,12 +169,14 @@ class Parser(SymbolParser):
         procedures = ['PROCEDURES']
 
         while self.is_sym('PROCEDURE'):
+            self.symtab.new_frame()
             self.get_sym()
             self.expect_sym('NAME')
             name = self.sym.value
 
             self.get_sym()
-            params = self.p_procedure_decl_parameters()
+            params = self.p_procedure_decl_params()
+            self.symtab.new_symbol(('PROCEDURE', (name, len(params) if params else 0), ),name)
 
             self.expect_sym('EOS')
 
